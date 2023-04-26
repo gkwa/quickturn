@@ -41,7 +41,7 @@ def publish_message():
         exit(1)
 
     # Publish to topic
-    sns_client.publish(TopicArn=topicArn,
+    sns_client.publish(TopicArn=topic_arn,
             Message="message text",
             Subject="subject used in emails only")
 
