@@ -23,4 +23,4 @@ except Exception as e:
     print(f"Failed to publish message: {e}")
 
 
-print(response["MessageId"]["HTTPSStatusCode"])
+print(response["ResponseMetadata"]["HTTPSStatusCode"])
