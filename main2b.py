@@ -1,5 +1,5 @@
 import logging
-import time
+
 import boto3
 from botocore.exceptions import ClientError
 
@@ -12,7 +12,7 @@ def list_topics():
 
     :return: An iterator that yields the topics.
     """
-    sns_client = boto3.client('sns')
+    sns_client = boto3.client("sns")
 
     try:
         topics_iter = sns_client.list_topics()
@@ -23,9 +23,9 @@ def list_topics():
     else:
         return topics_iter
 
-if __name__ == '__main__':
 
+if __name__ == "__main__":
     topics = list_topics()
 
-    for arn in topics['Topics']:
-        print(arn['TopicArn'])
+    for arn in topics["Topics"]:
+        print(arn["TopicArn"])

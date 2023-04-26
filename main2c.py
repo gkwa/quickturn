@@ -1,11 +1,13 @@
 import logging
 import time
+
 import boto3
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 
-sns_client = boto3.client('sns')
+sns_client = boto3.client("sns")
+
 
 def subscribe(topic, protocol, endpoint):
     """
@@ -18,14 +20,20 @@ def subscribe(topic, protocol, endpoint):
     """
     try:
         subscription = sns_client.subscribe(
-            TopicArn=topic, Protocol=protocol, Endpoint=endpoint, ReturnSubscriptionArn=True)
+            TopicArn=topic,
+            Protocol=protocol,
+            Endpoint=endpoint,
+            ReturnSubscriptionArn=True,
+        )
         logger.info("Subscribed %s %s to topic %s.", protocol, endpoint, topic)
     except ClientError:
         logger.exception(
-            "Couldn't subscribe %s %s to topic %s.", protocol, endpoint, topic)
+            "Couldn't subscribe %s %s to topic %s.", protocol, endpoint, topic
+        )
         raise
     else:
         return subscription
+
 
 def create_topic(name):
     """
@@ -37,21 +45,21 @@ def create_topic(name):
 
     try:
         topic = sns_client.create_topic(Name=name)
-        logger.info("Created topic %s with ARN %s.", name, topic['TopicArn'])
+        logger.info("Created topic %s with ARN %s.", name, topic["TopicArn"])
 
     except ClientError:
         logger.exception("Couldn't create topic %s.", name)
         raise
     else:
-        return topic['TopicArn']
+        return topic["TopicArn"]
 
-if __name__ == '__main__':
 
-    topic_name = f'demo-101-topic-{time.time_ns()}'
+if __name__ == "__main__":
+    topic_name = f"demo-101-topic-{time.time_ns()}"
 
     print(f"Creating topic {topic_name}.")
     # Create topic
     topicArn = create_topic(topic_name)
 
     # Create email subscription
-    response = subscribe(topicArn, "email", "myemail@host")
+    response = subscribe(topicArn, "email", "taylormonacelli@gmail.com")
