@@ -40,10 +40,22 @@ def publish_message():
         print("Missing SNS_TOPIC_ARN environment variable")
         exit(1)
 
-    # Publish to topic
-    sns_client.publish(TopicArn=topic_arn,
-            Message="message text",
-            Subject="subject used in emails only")
+    message = {"foo": "bar"}
+
+    response = sns_client.publish(
+        TargetArn=topic_arn,
+        Message=json.dumps({'default': json.dumps(message)}),
+        MessageStructure='json',
+        MessageAttributes={
+                            'foo': {
+                                'DataType': 'String',
+                                'StringValue': 'bar'
+                            }
+                        },
+    )
+    print(response)
+
+        
 
 
 def create_topic(name):
