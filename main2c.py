@@ -62,15 +62,6 @@ if __name__ == "__main__":
     topicArn = create_topic(topic_name)
 
     # Create email subscription
-    # response = subscribe(topicArn, "email", "taylormonacelli@gmail.com")
+    response = subscribe(topicArn, "email", "taylormonacelli@gmail.com")
 
-        
-    # Publish to topic
-    sns_client.publish(TopicArn=topicArn,
-            Message="message text",
-            Subject="subject used in emails only")
-
-
-
-demo-101-topic-1682485325255686100
 
