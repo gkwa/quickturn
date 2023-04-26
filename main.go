@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
-
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -12,10 +11,8 @@ import (
 )
 
 func main() {
-	// Set up AWS credentials
 	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("us-west-2"),
-		Endpoint: aws.String("https://sns.us-west-2.amazonaws.com"),
+		Region: aws.String("us-west-2"),
 	})
 
 	if err != nil {
@@ -27,7 +24,6 @@ func main() {
 	svc := sns.New(sess)
 
 	// Set up the SNS topic ARN to publish to
-
 	topicArn := os.Getenv("SNS_TOPIC_ARN")
 	if topicArn == "" {
 		fmt.Println("Missing SNS_TOPIC_ARN environment variable")
