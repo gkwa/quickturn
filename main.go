@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"encoding/json"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -32,9 +34,17 @@ func main() {
 		return
 	}
 
+	// Construct the JSON message to publish
+	message := map[string]int{"a": 1}
+	jsonMessage, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println("Failed to marshal JSON message", err)
+		return
+	}
+
 	// Publish the message to the topic
 	_, err = svc.Publish(&sns.PublishInput{
-		Message:  aws.String("hello"),
+		Message:  aws.String(string(jsonMessage)),
 		TopicArn: aws.String(topicArn),
 	})
 
