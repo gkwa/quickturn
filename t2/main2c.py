@@ -63,5 +63,3 @@ if __name__ == "__main__":
 
     # Create email subscription
     response = subscribe(topicArn, "email", "taylormonacelli@gmail.com")
-
-

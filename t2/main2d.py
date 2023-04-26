@@ -1,5 +1,7 @@
+import json
 import logging
-import time, os
+import os
+import time
 
 import boto3
 from botocore.exceptions import ClientError
@@ -34,6 +36,7 @@ def subscribe(topic, protocol, endpoint):
     else:
         return subscription
 
+
 def publish_message():
     topic_arn = os.environ.get("SNS_TOPIC_ARN")
     if not topic_arn:
@@ -44,18 +47,11 @@ def publish_message():
 
     response = sns_client.publish(
         TargetArn=topic_arn,
-        Message=json.dumps({'default': json.dumps(message)}),
-        MessageStructure='json',
-        MessageAttributes={
-                            'foo': {
-                                'DataType': 'String',
-                                'StringValue': 'bar'
-                            }
-                        },
+        Message=json.dumps({"default": json.dumps(message)}),
+        MessageStructure="json",
+        MessageAttributes={"foo": {"DataType": "String", "StringValue": "bar"}},
     )
     print(response)
-
-        
 
 
 def create_topic(name):
