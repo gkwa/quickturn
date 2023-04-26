@@ -1,5 +1,5 @@
 import logging
-import time
+import time, os
 
 import boto3
 from botocore.exceptions import ClientError
@@ -34,6 +34,17 @@ def subscribe(topic, protocol, endpoint):
     else:
         return subscription
 
+def publish_message():
+    topic_arn = os.environ.get("SNS_TOPIC_ARN")
+    if not topic_arn:
+        print("Missing SNS_TOPIC_ARN environment variable")
+        exit(1)
+
+    # Publish to topic
+    sns_client.publish(TopicArn=topicArn,
+            Message="message text",
+            Subject="subject used in emails only")
+
 
 def create_topic(name):
     """
@@ -57,20 +68,10 @@ def create_topic(name):
 if __name__ == "__main__":
     topic_name = f"demo-101-topic-{time.time_ns()}"
 
-    print(f"Creating topic {topic_name}.")
+    # print(f"Creating topic {topic_name}.")
     # Create topic
-    topicArn = create_topic(topic_name)
+    # topicArn = create_topic(topic_name)
 
     # Create email subscription
     # response = subscribe(topicArn, "email", "taylormonacelli@gmail.com")
-
-        
-    # Publish to topic
-    sns_client.publish(TopicArn=topicArn,
-            Message="message text",
-            Subject="subject used in emails only")
-
-
-
-demo-101-topic-1682485325255686100
-
+    publish_message()
