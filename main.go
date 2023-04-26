@@ -1,46 +1,42 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/sns"
-	"log"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sns"
+
+	"flag"
+	"fmt"
+	"os"
 )
 
-type Message struct {
-	Default string `json:"default"`
-}
-
-type Person struct {
-	Name string `json:"name"`
-}
-
 func main() {
-	cfg, _ := external.LoadDefaultAWSConfig()
-	snsClient := sns.New(cfg)
+	msgPtr := flag.String("m", "", "The message to send to the subscribed users of the topic")
+	topicPtr := flag.String("t", "", "The ARN of the topic to which the user subscribes")
 
-	person := Person{
-		Name: "Felix Kjellberg",
+	flag.Parse()
+
+	if *msgPtr == "" || *topicPtr == "" {
+		fmt.Println("You must supply a message and topic ARN")
+		fmt.Println("Usage: go run SnsPublish.go -m MESSAGE -t TOPIC-ARN")
+		os.Exit(1)
 	}
-	personStr, _ := json.Marshal(person)
 
-	message := Message{
-		Default: string(personStr),
-	}
-	messageBytes, _ := json.Marshal(message)
-	messageStr := string(messageBytes)
+	// Initialize a session that the SDK will use to load
+	// credentials from the shared credentials file. (~/.aws/credentials).
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
-	req := snsClient.PublishRequest(&sns.PublishInput{
-		TopicArn:         aws.String("arn:aws:sns:us-west-2:193048895737:hello1"),
-		Message:          aws.String(messageStr),
-		MessageStructure: aws.String("json"),
+	svc := sns.New(sess)
+
+	result, err := svc.Publish(&sns.PublishInput{
+		Message:  msgPtr,
+		TopicArn: topicPtr,
 	})
-
-	res, err := req.Send()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
-	log.Print(res)
+	fmt.Println(*result.MessageId)
 }
