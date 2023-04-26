@@ -2,52 +2,45 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
+	"log"
 )
 
+type Message struct {
+	Default string `json:"default"`
+}
+
+type Person struct {
+	Name string `json:"name"`
+}
+
 func main() {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2"),
+	cfg, _ := external.LoadDefaultAWSConfig()
+	snsClient := sns.New(cfg)
+
+	person := Person{
+		Name: "Felix Kjellberg",
+	}
+	personStr, _ := json.Marshal(person)
+
+	message := Message{
+		Default: string(personStr),
+	}
+	messageBytes, _ := json.Marshal(message)
+	messageStr := string(messageBytes)
+
+	req := snsClient.PublishRequest(&sns.PublishInput{
+		TopicArn:         aws.String("arn:aws:sns:us-west-2:193048895737:hello1"),
+		Message:          aws.String(messageStr),
+		MessageStructure: aws.String("json"),
 	})
 
+	res, err := req.Send()
 	if err != nil {
-		fmt.Println("Failed to create AWS session", err)
-		return
+		log.Fatal(err)
 	}
 
-	// Connect to the SNS service
-	svc := sns.New(sess)
-
-	// Set up the SNS topic ARN to publish to
-	topicArn := os.Getenv("SNS_TOPIC_ARN")
-	if topicArn == "" {
-		fmt.Println("Missing SNS_TOPIC_ARN environment variable")
-		return
-	}
-
-	// Construct the JSON message to publish
-	message := map[string]int{"a": 1}
-	jsonMessage, err := json.Marshal(message)
-	if err != nil {
-		fmt.Println("Failed to marshal JSON message", err)
-		return
-	}
-
-	// Publish the message to the topic
-	_, err = svc.Publish(&sns.PublishInput{
-		Message:  aws.String(string(jsonMessage)),
-		TopicArn: aws.String(topicArn),
-	})
-
-	if err != nil {
-		fmt.Println("Failed to publish message to SNS", err)
-		return
-	}
-
-	fmt.Println("Message published to SNS")
+	log.Print(res)
 }
