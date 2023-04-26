@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 )
@@ -43,21 +42,12 @@ func main() {
 	_, err = svc.Publish(&sns.PublishInput{
 		Message:  aws.String(string(jsonMessage)),
 		TopicArn: aws.String(topicArn),
-		Subject:  aws.String("Hello world"),
 	})
 
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			fmt.Printf("Failed to publish message to SNS: %s (HTTP status code %d)\n", aerr.Message(), aerr.StatusCode())
-		} else {
-			fmt.Println("Failed to publish message to SNS:", err)
-		}
+		fmt.Println("Failed to publish message to SNS", err)
 		return
 	}
 
-	// Print the response from SNS
-	fmt.Printf("Message published to SNS with message ID %s\n", *resp.MessageId)
-
-	// Print the response from SNS
-	fmt.Printf("Message published to SNS with message ID %s\n", *resp.MessageId)
+	fmt.Println("Message published to SNS")
 }
