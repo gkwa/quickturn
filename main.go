@@ -24,7 +24,12 @@ func main() {
 	svc := sns.New(sess)
 
 	// Set up the SNS topic ARN to publish to
-	topicArn := "YOUR_TOPIC_ARN"
+
+	topicArn := os.Getenv("SNS_TOPIC_ARN")
+	if topicArn == "" {
+		fmt.Println("Missing SNS_TOPIC_ARN environment variable")
+		return
+	}
 
 	// Publish the message to the topic
 	_, err = svc.Publish(&sns.PublishInput{
