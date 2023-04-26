@@ -11,7 +11,7 @@ import (
 func main() {
 	// Set up AWS credentials
 	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("YOUR_REGION"),
+		Region:   aws.String("us-west-2"),
 		Endpoint: aws.String("https://sns.us-west-2.amazonaws.com"),
 	})
 
