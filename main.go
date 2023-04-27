@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -10,28 +11,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() {
-	// Set up the root command and its flags
-	rootCmd := &cobra.Command{
-		Use:   "sns-publish",
-		Short: "Publish a message to an SNS topic",
-		Run:   run,
-	}
-	rootCmd.PersistentFlags().StringP("message", "m", "", "The JSON message to publish")
+var rootCmd = &cobra.Command{
+	Use:   "sns-publish",
+	Short: "Publish a message to an SNS topic",
+	Run:   publishMessage,
+}
 
-	// Execute the root command
-	err := rootCmd.Execute()
-	if err != nil {
+var topicArn string
+var message string
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&topicArn, "topic-arn", "", "The ARN of the SNS topic to publish to")
+	rootCmd.PersistentFlags().StringVar(&message, "message", "", "The JSON message to publish")
+	rootCmd.MarkPersistentFlagRequired("topic-arn")
+	rootCmd.MarkPersistentFlagRequired("message")
+}
+
+func main() {
+	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
-func run(cmd *cobra.Command, args []string) {
+func publishMessage(cmd *cobra.Command, args []string) {
 	// Set up AWS credentials
 	sess, err := session.NewSession(&aws.Config{
 		Region:   aws.String("us-west-2"),
 		Endpoint: aws.String("https://sns.us-west-2.amazonaws.com"),
 	})
+
 	if err != nil {
 		fmt.Println("Failed to create AWS session", err)
 		return
@@ -40,26 +49,15 @@ func run(cmd *cobra.Command, args []string) {
 	// Connect to the SNS service
 	svc := sns.New(sess)
 
-	// Set up the SNS topic ARN to publish to
-	topicArn := "arn:aws:sns:us-west-2:123456789012:MyTopic"
-
-	// Get the JSON message from the command-line argument
-	message, err := cmd.PersistentFlags().GetString("message")
-	if err != nil {
-		fmt.Println("Failed to get message flag", err)
-		return
-	}
-
-	// Unmarshal the JSON message
-	var jsonMessage interface{}
-	err = json.Unmarshal([]byte(message), &jsonMessage)
+	// Construct the JSON message to publish
+	var inputMessage map[string]interface{}
+	err = json.Unmarshal([]byte(message), &inputMessage)
 	if err != nil {
 		fmt.Println("Failed to unmarshal JSON message", err)
 		return
 	}
 
-	// Marshal the JSON message
-	jsonBytes, err := json.Marshal(jsonMessage)
+	jsonMessage, err := json.Marshal(inputMessage)
 	if err != nil {
 		fmt.Println("Failed to marshal JSON message", err)
 		return
@@ -67,7 +65,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Publish the message to the topic
 	_, err = svc.Publish(&sns.PublishInput{
-		Message:  aws.String(string(jsonBytes)),
+		Message:  aws.String(string(jsonMessage)),
 		TopicArn: aws.String(topicArn),
 	})
 
