@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -50,12 +49,9 @@ func publishMessage(cmd *cobra.Command, args []string) {
 	// Connect to the SNS service
 	svc := sns.New(sess)
 
-	// Encode the message as Base64
-	encodedMessage := base64.StdEncoding.EncodeToString([]byte(message))
-
 	// Publish the message to the topic
 	_, err = svc.Publish(&sns.PublishInput{
-		Message:  aws.String(encodedMessage),
+		Message:  aws.String(message),
 		TopicArn: aws.String(topicArn),
 	})
 
