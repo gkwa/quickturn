@@ -17,8 +17,10 @@ var rootCmd = &cobra.Command{
 	Run:   publishMessage,
 }
 
-var topicArn string
-var message string
+var (
+	topicArn string
+	message  string
+)
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&topicArn, "topic-arn", "", "The ARN of the SNS topic to publish to")
@@ -40,7 +42,6 @@ func publishMessage(cmd *cobra.Command, args []string) {
 		Region:   aws.String("us-west-2"),
 		Endpoint: aws.String("https://sns.us-west-2.amazonaws.com"),
 	})
-
 	if err != nil {
 		fmt.Println("Failed to create AWS session", err)
 		return
@@ -49,23 +50,9 @@ func publishMessage(cmd *cobra.Command, args []string) {
 	// Connect to the SNS service
 	svc := sns.New(sess)
 
-	// Construct the JSON message to publish
-	var inputMessage map[string]interface{}
-	err = json.Unmarshal([]byte(message), &inputMessage)
-	if err != nil {
-		fmt.Println("Failed to unmarshal JSON message", err)
-		return
-	}
-
-	jsonMessage, err := json.Marshal(inputMessage)
-	if err != nil {
-		fmt.Println("Failed to marshal JSON message", err)
-		return
-	}
-
 	// Publish the message to the topic
 	_, err = svc.Publish(&sns.PublishInput{
-		Message:  aws.String(string(jsonMessage)),
+		Message:  aws.String(message),
 		TopicArn: aws.String(topicArn),
 	})
 
