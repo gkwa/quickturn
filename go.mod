@@ -3,7 +3,7 @@ module github.com/taylormonacelli/quickturn
 go 1.20
 
 require (
-	github.com/aws/aws-lambda-go v1.40.0
+	github.com/aws/aws-lambda-go v1.47.0
 	github.com/aws/aws-sdk-go v1.44.250
 	github.com/google/uuid v1.3.0
 	github.com/spf13/cobra v1.7.0
