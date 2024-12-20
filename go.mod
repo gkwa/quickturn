@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.8.1
-	golang.org/x/net v0.32.0
+	golang.org/x/net v0.33.0
 )
 
 require (
