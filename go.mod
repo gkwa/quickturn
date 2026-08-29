@@ -1,11 +1,11 @@
 module github.com/taylormonacelli/quickturn
 
-go 1.25.0
+go 1.26
 
 toolchain go1.27.0
 
 require (
-	github.com/aws/aws-lambda-go v1.54.0
+	github.com/aws/aws-lambda-go v1.55.0
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.10.2
