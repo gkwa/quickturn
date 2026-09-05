@@ -2,7 +2,7 @@ module github.com/taylormonacelli/quickturn
 
 go 1.26
 
-toolchain go1.27.0
+toolchain go1.27.1
 
 require (
 	github.com/aws/aws-lambda-go v1.55.0
